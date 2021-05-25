@@ -11,6 +11,7 @@
         <!-- Template is the response to the pattern -->
         <!-- This learn an aiml file -->
         <template>
+            <load>standard/*.aiml</load>
             <load>*.aiml</load>
             <!-- You can add more aiml files here -->
             <!--<learn>more_aiml.aiml</learn>-->

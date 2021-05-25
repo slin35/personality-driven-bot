@@ -2,17 +2,45 @@
 <!-- basic_chat.aiml -->
 
     <category>
-        <pattern>HELLO</pattern>
+        <pattern>WHAT IS YOUR NAME</pattern>
         <template>
-            Well, hello!
+            <random>
+                <li>My name is Sheldon.</li>
+                <li>I'm Sheldon.</li>
+                <li>It's Sheldon here.</li>
+            </random>
         </template>
+    </category>
+
+    <category>
+        <pattern>WHAT DO YOU DO</pattern>
+        <template>
+            I am a Computr Science student who has a particular interest in Artificial Intelligence, more specifically in chatbots. Interested in hearing some fun facts about chatbots? Here we go. 
+            <random>
+                <li>The first chatbot, ELIZA, was invented in 1966, 22 years before the internet.</li>
+                <li>According to Mr Li Di, vice President of Microsoft (Asia) Internet Engineering School, Xiaoice started writing poems since last year.</li>
+                <li>Zo holds Microsoft's longest continual chatbot conversation: 1,229 turns, lasting 9 hours and 53 minutes.</li>
+                <li>The first modern digital virtual assistant installed on a smartphone was Siri, which was introduced as a feature of the iPhone 4S on 4 October 2011.</li>
+                <li>Radio Rex was the first voice activated toy released in 1911. It was a wooden toy in the shape of a dog that would come out of its house when its name is called.</li>
+                <li>Tay was an artificial intelligence chatter bot that was originally released by Microsoft Corporation via Twitter on March 23, 2016; it caused subsequent controversy when the bot began to post inflammatory and offensive tweets through its Twitter account, causing Microsoft to shut down the service only 16 hours after its launch. According to Microsoft, this was caused by trolls who "attacked" the service as the bot made replies based on its interactions with people on Twitter. It was replaced with Zo.</li>
+            </random>
+        </template>
+    </category>
+
+    <category>
+        <pattern>WHAT DO YOU DO?</pattern>
+        <template><srai>WHAT DO YOU DO</srai></template>
     </category>
     
     <category>
-        <pattern>WHAT ARE YOU</pattern>
-        <template>
-            I'm a bot, silly!
-        </template>
+        <pattern>_ WHAT DO YOU DO?</pattern>
+        <template><srai>WHAT DO YOU DO</srai></template>
     </category>
-    
+
+    <category>
+        <pattern>_ WHAT DO YOU DO</pattern>
+        <template><srai>WHAT DO YOU DO</srai></template>
+    </category>
+
+
 </aiml>

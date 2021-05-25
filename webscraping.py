@@ -111,9 +111,12 @@ def getInfo():
         content = content.replace("&", "and")
         content = re.sub(r"\[.*?\]+", '', content)
 
+        '''
         keywords =[x.upper() for x in keywordExtraction(content)]
         if title.upper() not in keywords:
             keywords.append(title.upper())
+        '''
+        keywords = [title.upper()]
 
         content = content.strip().split('\n')
         content = [x for x in content if len(x) != 0]
@@ -122,9 +125,9 @@ def getInfo():
         knowledge.append((keywords, content))
         
     # write to aiml file
-    writeHeader("knowledge.aiml")
-    writeCategory("knowledge.aiml", knowledge)
-    writeEnding("knowledge.aiml")
+    writeHeader("knowledge_s.aiml")
+    writeCategory("knowledge_s.aiml", knowledge)
+    writeEnding("knowledge_s.aiml")
 
 
 def writeCategory(filename: str, knowledge: list):
