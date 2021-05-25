@@ -98,10 +98,8 @@ def getInfo():
     # to store a list of key words and list of contents
     knowledge = []
 
-    flag = True
     for url in urls:
-        if flag == False:
-            break
+  
         source = urlopen(url).read()
         soup = BeautifulSoup(source,'lxml')
 
@@ -109,26 +107,28 @@ def getInfo():
         content = ''
         for p in soup.find_all('p'):
             content += p.text
-       
-        content = re.sub(r"\[.*?\]+", '', content)
 
-        flag = False
+        content = content.replace("&", "and")
+        content = re.sub(r"\[.*?\]+", '', content)
 
         keywords =[x.upper() for x in keywordExtraction(content)]
         if title.upper() not in keywords:
             keywords.append(title.upper())
 
-        knowledge.append((keywords, content.strip().split('\n')))
+        content = content.strip().split('\n')
+        content = [x for x in content if len(x) != 0]
+        content = [x for x in content if x[-1] == '.' or x[-1] == '?']
+
+        knowledge.append((keywords, content))
         
-        print(knowledge)
-        # write to aiml file
-    #    writeHeader("knowledge.aiml")
-    #    writeCategory("knowledge.aiml", knowledge)
-    #    writeEnding("knowledge.aiml")
+    # write to aiml file
+    writeHeader("knowledge.aiml")
+    writeCategory("knowledge.aiml", knowledge)
+    writeEnding("knowledge.aiml")
 
 
 def writeCategory(filename: str, knowledge: list):
-    file = open(filename, 'a')
+    file = open(filename, 'a', encoding='utf-8')
     for (keywords, content) in knowledge:
         # write main body
         key = keywords[0]
@@ -144,8 +144,10 @@ def writeCategory(filename: str, knowledge: list):
 
         # write synonyms
         for keyword in keywords:
-            combos = ['_ ' + keyword, keyword + ' *', '_ ' + keyword + ' *']
+            combos = ['_ ' + keyword, keyword + ' *', '_ ' + keyword + ' *', keyword]
             for combo in combos:
+                if combo == key:
+                    continue
                 file.write(CATEGORY_S)
                 file.write(PATTERN_S + combo + PATTERN_E)
                 file.write(TEMPLATE_S)
@@ -157,14 +159,14 @@ def writeCategory(filename: str, knowledge: list):
 
 
 def writeHeader(filename):
-    file = open(filename, 'a')
+    file = open(filename, 'a', encoding='utf-8')
     file.write('<?xml version = "1.0" encoding = "UTF-8"?>\n')
     file.write(AIML_S)
     file.close()
 
 
 def writeEnding(filename):
-    file = open(filename, 'a')
+    file = open(filename, 'a', encoding='utf-8')
     file.write(AIML_E)
     file.close()
 
