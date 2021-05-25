@@ -41,7 +41,7 @@ class TestBot:
         if os.path.isfile("bot_brain.brn"):
             self.kernel.bootstrap(brainFile = "bot_brain.brn")
         else:
-            self.kernel.bootstrap(learnFiles="std-startup.xml", commands="load aiml all")
+            self.kernel.bootstrap(learnFiles="std-startup.xml", commands="load aiml b")
             self.kernel.saveBrain("bot_brain.brn")
 
     def process_utterance(self, msg):
@@ -68,6 +68,7 @@ class TestBot:
 
 
 def main():
+    '''    
     if len(sys.argv) != 4:
         print("Usage: testbot <server[:port]> <channel> <nickname>")
         sys.exit(1)
@@ -78,7 +79,12 @@ def main():
     port = sys.argv[1][_idx:] if sys.argv[1][_idx:].isnumeric() else 6667
     channel = sys.argv[2]
     nickname = sys.argv[3]
+    '''
 
+    server = "irc.freenode.net"
+    port = 6667
+    channel = "#CSC582"
+    nickname = "alice-bot"
     if "-bot" not in nickname:
         print("chatbot's nickname must end with string '-bot'")
         sys.exit(1)
