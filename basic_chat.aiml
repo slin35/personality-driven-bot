@@ -42,5 +42,13 @@
         <template><srai>WHAT DO YOU DO</srai></template>
     </category>
 
+    <category>
+        <pattern>SNIDE</pattern>
+        <template>
+        What do you know about bots?
+        <srai>CHATBOT</srai>
+        </template>
+    </category>
+
 
 </aiml>

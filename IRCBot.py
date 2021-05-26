@@ -3,6 +3,7 @@ import socket
 import time
 import aiml
 import os
+import memory
 
 class IRCBot:
     def __init__(self, server, port, channel, nickname):
@@ -11,6 +12,7 @@ class IRCBot:
         self.port = port
         self.channel = channel
         self.nickname = nickname
+        self.memory = memory.Memory()
 
     def connect(self):
         self.irc.connect((self.server, self.port))
@@ -52,19 +54,68 @@ class IRCBot:
             channel = msg.split('PRIVMSG', 1)[1].split(':', 1)[0] or ''
             userMsg = msg.split('PRIVMSG', 1)[1].split(':', 1)[1] or ''
 
-            if f"{self.nickname}: die" in userMsg:
+            if f"{self.nickname}:die" in userMsg:
                 self.send("Bye!")
                 self.irc.send(bytes(f"QUIT\n", "UTF-8"))
                 self.irc.shutdown(socket.SHUT_RDWR)
                 self.irc.close()
                 sys.exit()
+            elif f"{self.nickname}:*forget" in userMsg:
+                self.memory.reset()
             elif "list" in userMsg:
                 self.irc.send(bytes(f"NAMES {self.channel}\n", "UTF-8"))
                 names = self.get_response().split(":")[2].strip('\r\n')
                 self.send(names)
-            else:               
-                response = self.kernel.respond(userMsg)
+            elif 'Hi' in userMsg or "Hello" in userMsg or 'hi' in userMsg or 'hello' in userMsg:
+                response = f"{self.kernel.respond('hello')} {user}"
                 self.send(response)
+            elif f"{self.nickname}:" in userMsg:
+                userMsg = userMsg.split(':', 1)[1]
+                response = self.kernel.respond(userMsg)
+
+                words = ['chatbot', 'chatbots', 'bot', 'bots']
+                words_in_msg = any(x in userMsg for x in words)
+                
+                if "don't like" in userMsg and words_in_msg:
+                    response = "That's unfortunate. What do you like then?"
+                elif 'like' in userMsg and words_in_msg:
+                    response = self.kernel.respond("chatbot")
+                    response = response[0].lower() + response[1:]
+                    response = f"I like chatbots too! Do you know that {response}"
+                elif 'favorite' in userMsg and words_in_msg:
+                    chatbot = userMsg.split()[-1]
+                    response = self.kernel.respond(chatbot)
+                    response = response[0].lower() + response[1:]
+                    response = f"Speaking of {chatbot}, {response}"
+                elif words_in_msg:
+                    response = self.kernel.respond("snide")
+
+                self.send(response)
+
+                if user in self.memory.mem:
+                    response = ''
+                    if self.memory.mem[user].snide:
+                        response = f'You mentioned chatbots last time, what else do you know?'
+                        self.send(response)
+                        response = self.kernel.respond("snide")
+                    elif self.memory.mem[user].fav_chatbot:
+                        response = f'You mentioned your favorite chatbot is {self.memory.mem[user.fav_chatbot]} last time, I also happened to know a few more things about it.'
+                        self.send(response)
+                        response = self.kernel.respond(self.memory.mem[user.fav_chatbot])
+                    elif self.memory.mem[user].chatbot_interest == False:
+                        response = 'You never mention it. Do you like chatbots?'
+                    elif self.memory.mem[user].chatbot_interest:
+                        response = self.kernel.respond("snide")
+                        response = f'You expressed interest about chatbots. {response}'
+                    elif self.memory.mem[user].chatbot_dislike:
+                        response = "It's a shame that you're not interested in chatbots."
+
+                    if response:
+                        self.send(response)
+
+                self.memory.update_mem(user, userMsg)
+            else:               
+                pass
 
 
 def main():
@@ -84,7 +135,7 @@ def main():
     server = "irc.freenode.net"
     port = 6667
     channel = "#CSC582"
-    nickname = "alice-bot"
+    nickname = "sheldon-bot"
     if "-bot" not in nickname:
         print("chatbot's nickname must end with string '-bot'")
         sys.exit(1)
