@@ -12,7 +12,7 @@
         <!-- This learn an aiml file -->
         <template>
             <load>standard/*.aiml</load>
-            <load>*.aiml</load>
+            <load>knowledge/*.aiml</load>
             <!-- You can add more aiml files here -->
             <!--<learn>more_aiml.aiml</learn>-->
         </template>
