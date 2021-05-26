@@ -4,6 +4,8 @@ import time
 import aiml
 import os
 import memory
+import re
+from nltk import tokenize
 
 class IRCBot:
     def __init__(self, server, port, channel, nickname):
@@ -21,21 +23,26 @@ class IRCBot:
         self.irc.send(bytes(f"JOIN {self.channel}\n", "UTF-8"))
 
     def get_response(self):
-        time.sleep(1)
         resp = self.irc.recv(2040).decode("UTF-8")
         return resp
 
-    def send(self, msg):
-        self.irc.send(bytes(f"PRIVMSG {self.channel} :{msg}\n", "UTF-8"))
+    def send(self, msg, user):
+        sentences = tokenize.sent_tokenize(msg)
+        for sent in sentences:
+            time.sleep(2)
+            self.irc.send(bytes(f"PRIVMSG {self.channel} :{user}:{sent}\n", "UTF-8"))
 
     def start(self):
         self.connect()
-
+        
+        print("server connected")
         self.setup_kernel()
+        print('kernel setup done')
 
         while True:
             msg = self.get_response()
-            self.process_utterance(msg)
+            if 'PRIVMSG' in msg and self.channel in msg:
+                self.process_utterance(msg)
             
     def setup_kernel(self):
         self.kernel = aiml.Kernel()
@@ -48,14 +55,15 @@ class IRCBot:
 
     def process_utterance(self, msg):
         # message format <nickname_of_sender>!<hostname> PRIVMSG <channel> :<message>
-        print(msg)
-        if msg.find("PRIVMSG") != -1:
-            user = msg.split('!', 1)[0][1:]
-            channel = msg.split('PRIVMSG', 1)[1].split(':', 1)[0] or ''
-            userMsg = msg.split('PRIVMSG', 1)[1].split(':', 1)[1] or ''
-
+        
+        user = msg.split('!', 1)[0][1:]
+        channel = msg.split('PRIVMSG', 1)[1].split(':', 1)[0] or ''
+        userMsg = msg.split('PRIVMSG', 1)[1].split(':', 1)[1] or ''
+        
+        if user != self.nickname:
+        
             if f"{self.nickname}:die" in userMsg:
-                self.send("Bye!")
+                self.send(self.kernel.respond("bye"), user)
                 self.irc.send(bytes(f"QUIT\n", "UTF-8"))
                 self.irc.shutdown(socket.SHUT_RDWR)
                 self.irc.close()
@@ -65,10 +73,7 @@ class IRCBot:
             elif "list" in userMsg:
                 self.irc.send(bytes(f"NAMES {self.channel}\n", "UTF-8"))
                 names = self.get_response().split(":")[2].strip('\r\n')
-                self.send(names)
-            elif 'Hi' in userMsg or "Hello" in userMsg or 'hi' in userMsg or 'hello' in userMsg:
-                response = f"{self.kernel.respond('hello')} {user}"
-                self.send(response)
+                self.send(names, user)
             elif f"{self.nickname}:" in userMsg:
                 userMsg = userMsg.split(':', 1)[1]
                 response = self.kernel.respond(userMsg)
@@ -90,33 +95,33 @@ class IRCBot:
                 elif words_in_msg:
                     response = self.kernel.respond("snide")
 
-                self.send(response)
+                self.send(response, user)
+                
 
                 if user in self.memory.mem:
                     response = ''
+                    print('hello')
+                    
                     if self.memory.mem[user].snide:
-                        response = f'You mentioned chatbots last time, what else do you know?'
-                        self.send(response)
-                        response = self.kernel.respond("snide")
+                        response = f'You mentioned chatbots last time, what else do you know? {self.kernel.respond("snide")}'
                     elif self.memory.mem[user].fav_chatbot:
-                        response = f'You mentioned your favorite chatbot is {self.memory.mem[user.fav_chatbot]} last time, I also happened to know a few more things about it.'
-                        self.send(response)
-                        response = self.kernel.respond(self.memory.mem[user.fav_chatbot])
-                    elif self.memory.mem[user].chatbot_interest == False:
-                        response = 'You never mention it. Do you like chatbots?'
-                    elif self.memory.mem[user].chatbot_interest:
-                        response = self.kernel.respond("snide")
-                        response = f'You expressed interest about chatbots. {response}'
+                        response = f'You mentioned your favorite chatbot is {self.memory.mem[user.fav_chatbot]} last time, I also happened to know a few more things about it. {self.kernel.respond(self.memory.mem[user.fav_chatbot])}'
                     elif self.memory.mem[user].chatbot_dislike:
                         response = "It's a shame that you're not interested in chatbots."
-
+                    elif self.memory.mem[user].chatbot_interest:
+                        response = f'You expressed interest about chatbots last time. {self.kernel.respond("snide")}'
+                    
+                    
                     if response:
-                        self.send(response)
-
+                        self.send(response, user)
+                    
                 self.memory.update_mem(user, userMsg)
+                if self.memory.mem[user].chatbot_interest == False and self.memory.mem[user].chatbot_dislike == False and self.memory.mem[user].snide == False:
+                    response = 'You never mention it. Do you like chatbots?'
+
             else:               
                 pass
-
+            
 
 def main():
     '''    

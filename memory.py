@@ -34,4 +34,5 @@ class User:
             self.snide = True
         elif "don't like" in data and words_in_msg:
             self.chatbot_dislike = True
-    
+
+        return self

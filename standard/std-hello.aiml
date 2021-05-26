@@ -198,15 +198,13 @@ Do you mean "bye"?
 
 <random>
 
-<li>See you later <get name="name"/>.</li>
+<li>See you later.</li>
 
-<li>Goodbye <get name="name"/>.</li>
+<li>Goodbye.</li>
 
-<li>Until next time <get name="name"/>.</li>
+<li>Until next time.</li>
 
-<li>Thanks for chatting, <get name="name"/>.</li>
-
-<li>See you later <get name="name"/>.</li>
+<li>See you later.</li>
 
 </random>
 

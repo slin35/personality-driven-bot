@@ -218,10 +218,6 @@
 
 <li>That remark was either too complex or too simple for me. We were talking about <get name="topic"/>.</li>
 
-<li>The ALICE chat robot can follow many things, like our discussion about <get name="topic"/>.  But I did not get that.</li>
-
-<li>The ALICE chat robot can follow many things, like our discussion about <get name="topic"/>.  Try being more or less specific.</li>
-
 </random>
 
 </template>

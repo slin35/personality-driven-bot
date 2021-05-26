@@ -1414,7 +1414,7 @@ I see. <set name="he"><star/></set>
 
 <template>
 
-Hi there <get name="name"/>. <sr/>
+<srai>HI</srai>
 
 </template>
 
