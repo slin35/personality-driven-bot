@@ -15,7 +15,7 @@
     <category>
         <pattern>WHAT DO YOU DO</pattern>
         <template>
-            I am a Computr Science student who has a particular interest in Artificial Intelligence, more specifically in chatbots. Interested in hearing some fun facts about chatbots? Here we go. 
+            I am a Computer Science student who has a particular interest in Artificial Intelligence, more specifically in chatbots. Interested in hearing some fun facts about chatbots? Here we go. 
             <random>
                 <li>The first chatbot, ELIZA, was invented in 1966, 22 years before the internet.</li>
                 <li>According to Mr Li Di, vice President of Microsoft (Asia) Internet Engineering School, Xiaoice started writing poems since last year.</li>

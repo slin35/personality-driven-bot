@@ -7,6 +7,8 @@ import memory
 import re
 from nltk import tokenize
 
+MAX_SENT = 4
+
 class IRCBot:
     def __init__(self, server, port, channel, nickname):
         self.irc = socket.socket()
@@ -28,8 +30,8 @@ class IRCBot:
 
     def send(self, msg, user):
         sentences = tokenize.sent_tokenize(msg)
-        for sent in sentences:
-            time.sleep(2)
+        for sent in sentences[:MAX_SENT]:
+            time.sleep(4)
             self.irc.send(bytes(f"PRIVMSG {self.channel} :{user}:{sent}\n", "UTF-8"))
 
     def start(self):
@@ -59,7 +61,8 @@ class IRCBot:
         user = msg.split('!', 1)[0][1:]
         channel = msg.split('PRIVMSG', 1)[1].split(':', 1)[0] or ''
         userMsg = msg.split('PRIVMSG', 1)[1].split(':', 1)[1] or ''
-        
+        inquiry_flag = False
+
         if user != self.nickname:
         
             if f"{self.nickname}:die" in userMsg:
@@ -94,13 +97,18 @@ class IRCBot:
                     response = f"Speaking of {chatbot}, {response}"
                 elif words_in_msg:
                     response = self.kernel.respond("snide")
-
+                elif user in self.memory.mem:
+                    if self.memory.mem[user].chatbot_interest == False and self.memory.mem[user].chatbot_dislike == False and self.memory.mem[user].snide == False:
+                        inquiry_flag = True
+                                        
                 self.send(response, user)
-                
+                if inquiry_flag:
+                    self.send('BTW, you never mention it, do you like chatbots?', user)
+                    inquiry_flag = False
 
                 if user in self.memory.mem:
+                    time.sleep(4)
                     response = ''
-                    print('hello')
                     
                     if self.memory.mem[user].snide:
                         response = f'You mentioned chatbots last time, what else do you know? {self.kernel.respond("snide")}'
@@ -110,15 +118,12 @@ class IRCBot:
                         response = "It's a shame that you're not interested in chatbots."
                     elif self.memory.mem[user].chatbot_interest:
                         response = f'You expressed interest about chatbots last time. {self.kernel.respond("snide")}'
-                    
-                    
                     if response:
                         self.send(response, user)
-                    
-                self.memory.update_mem(user, userMsg)
-                if self.memory.mem[user].chatbot_interest == False and self.memory.mem[user].chatbot_dislike == False and self.memory.mem[user].snide == False:
-                    response = 'You never mention it. Do you like chatbots?'
 
+                        
+                self.memory.update_mem(user, userMsg)
+                
             else:               
                 pass
             

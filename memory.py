@@ -26,13 +26,14 @@ class User:
         words = ['chatbot', 'chatbots', 'bot', 'bots']
         words_in_msg = any(x in data for x in words)
 
-        if 'like' in data and words_in_msg:
+        if "don't like" in data and words_in_msg:
+            self.chatbot_dislike = True
+        elif 'like' in data and words_in_msg:
             self.chatbot_interest = True
         elif 'favorite' in data and words_in_msg:
             self.fav_chatbot = data.strip().split()[-1]
         elif words_in_msg:
             self.snide = True
-        elif "don't like" in data and words_in_msg:
-            self.chatbot_dislike = True
+        
 
         return self
