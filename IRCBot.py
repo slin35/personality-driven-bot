@@ -8,6 +8,7 @@ import re
 from nltk import tokenize
 
 MAX_SENT = 4
+SLEEP_TIME = 2
 
 class IRCBot:
     def __init__(self, server, port, channel, nickname):
@@ -31,7 +32,7 @@ class IRCBot:
     def send(self, msg, user):
         sentences = tokenize.sent_tokenize(msg)
         for sent in sentences[:MAX_SENT]:
-            time.sleep(4)
+            time.sleep(SLEEP_TIME)
             self.irc.send(bytes(f"PRIVMSG {self.channel} :{user}:{sent}\n", "UTF-8"))
 
     def start(self):
@@ -65,15 +66,16 @@ class IRCBot:
 
         if user != self.nickname:
         
-            if f"{self.nickname}:die" in userMsg:
+            if f"{self.nickname}: die" in userMsg:
                 self.send(self.kernel.respond("bye"), user)
                 self.irc.send(bytes(f"QUIT\n", "UTF-8"))
                 self.irc.shutdown(socket.SHUT_RDWR)
                 self.irc.close()
                 sys.exit()
-            elif f"{self.nickname}:*forget" in userMsg:
+            elif f"{self.nickname}: forget" in userMsg:
                 self.memory.reset()
-            elif "list" in userMsg:
+                print("forget executed")
+            elif f"{self.nickname}: list" == userMsg.strip():
                 self.irc.send(bytes(f"NAMES {self.channel}\n", "UTF-8"))
                 names = self.get_response().split(":")[2].strip('\r\n')
                 self.send(names, user)
@@ -107,7 +109,7 @@ class IRCBot:
                     inquiry_flag = False
 
                 if user in self.memory.mem:
-                    time.sleep(4)
+                    time.sleep(SLEEP_TIME)
                     response = ''
                     
                     if self.memory.mem[user].snide:
@@ -129,7 +131,7 @@ class IRCBot:
             
 
 def main():
-    '''    
+       
     if len(sys.argv) != 4:
         print("Usage: testbot <server[:port]> <channel> <nickname>")
         sys.exit(1)
@@ -140,12 +142,7 @@ def main():
     port = sys.argv[1][_idx:] if sys.argv[1][_idx:].isnumeric() else 6667
     channel = sys.argv[2]
     nickname = sys.argv[3]
-    '''
-
-    server = "irc.freenode.net"
-    port = 6667
-    channel = "#CSC582"
-    nickname = "sheldon-bot"
+    
     if "-bot" not in nickname:
         print("chatbot's nickname must end with string '-bot'")
         sys.exit(1)
